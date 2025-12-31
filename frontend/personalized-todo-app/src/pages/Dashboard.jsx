@@ -25,7 +25,7 @@ export default function Dashboard() {
     fetchTasks();
   }, []);
 
-  // ✅ 1. ADDED: Toggle Complete Function
+  //  Toggle Complete Function
   const toggleComplete = async (task) => {
     try {
       // Backend mein PATCH request bhej rahe hain status change karne ke liye
@@ -118,7 +118,7 @@ export default function Dashboard() {
                   {isAiLoading ? 'Analyzing...' : 'AI Insights ✨'}
                 </button>
 
-                {/* ✅ 2. UPDATED: Complete/Undo Button */}
+                {/* Complete/Undo Button */}
                 <button 
                   onClick={() => toggleComplete(task)}
                   className={`px-2 py-1 rounded transition text-sm font-medium ${task.completed ? 'text-yellow-500 hover:bg-yellow-500/10' : 'text-green-500 hover:bg-green-500/10'}`}
