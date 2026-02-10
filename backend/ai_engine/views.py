@@ -9,17 +9,51 @@ class GeminiSuggestView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        task_title = request.data.get("title")
+        title = request.data.get("title")
+        description = request.data.get("description", "")
 
-        if not task_title:
-            return Response({"error": "Title is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not title and not description:
+            return Response(
+                {"error": "Title or description is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel("gemini-3-flash-preview")
 
-            model = genai.GenerativeModel(model_name="gemini-3-flash-preview")
+            prompt = f"""
+You are an expert mentor for ANY field.
 
-            prompt = f"User is doing: {task_title}. Suggest one helpful related sub-task in under 15 words."
+LANGUAGE RULE:
+- If user input is Hindi or Hinglish → respond in Hindi/Hinglish
+- If user input is English → respond in English
+
+TASK TITLE:
+"{title}"
+
+TASK DESCRIPTION (MAIN CONTEXT):
+"{description}"
+
+Create a clear, structured roadmap so that even a beginner understands
+from basic to advanced level.
+
+FORMAT RULES:
+- Markdown only
+- Headings + bullet points
+- Simple, practical language
+- No long paragraphs
+
+STRUCTURE:
+## Title
+### Level 1: Beginner
+### Level 2: Intermediate
+### Level 3: Advanced
+### Practical Actions
+### Common Mistakes
+### Final Tips
+"""
+
             response = model.generate_content(prompt)
 
             return Response({
@@ -28,4 +62,7 @@ class GeminiSuggestView(APIView):
             })
 
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
