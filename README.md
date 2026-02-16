@@ -1,52 +1,186 @@
-# 🚀 AI-Powered Task Agent (Full Stack)
+# 🚀 AI-Powered Smart Task Agent (Full Stack with Analytics)
 
-This is a modern Task Management application that uses an **AI Agent** to help users organize and execute their tasks more efficiently. Built with **React** and **Django Rest Framework**.
+A modern **AI-Driven Task Management System** that helps users organize, analyze, and execute tasks efficiently.
+The application integrates an **AI Agent**, **JWT Authentication**, and a **Task Analytics Dashboard** with visual reports.
 
-## 🧠 AI Agent Capabilities
-Unlike a normal Todo list, this app features an **Integrated AI Agent**:
-* **Smart Analysis**: The Agent reads your task title and understands the context.
-* **Actionable Insights**: Instead of just storing tasks, the Agent provides technical tips and execution plans.
-* **Proactive Help**: Users can trigger the Agent using the "AI Insights" button to get immediate guidance on complex tasks.
-
-## ✨ Key Features
-* **Secure Authentication**: User accounts protected by JWT (Login/Register).
-* **Full CRUD**: Create, Read, Update, and Delete tasks seamlessly.
-* **Task Filtering**: Organise tasks by 'All', 'Pending', or 'Completed' status.
-* **Real-time Feedback**: UI updates instantly when tasks are modified or deleted.
-* **Responsive Dark UI**: Professional interface built with Tailwind CSS.
-
-## 🛠️ Tech Stack
-* **Frontend**: React.js (Vite), Tailwind CSS, Axios.
-* **Backend**: Django, Django Rest Framework (DRF), SimpleJWT.
-* **AI Engine**: Python-based logic for processing AI Suggestions.
-* **Database**: SQLite (Default).
+Built using **React, Django Rest Framework, and Supabase**.
 
 ---
 
-## 🚀 Installation & Setup
+# 🧠 AI Agent Capabilities
 
-### 1. Backend (Django)
-1. Navigate to `backend` folder.
-2. Create virtual environment: `python -m venv venv`.
-3. Activate: `venv\Scripts\activate` (Windows).
-4. Install dependencies: `pip install -r requirements.txt`.
-5. Run migrations: `python manage.py migrate`.
-6. Start: `python manage.py runserver`.
+Unlike a traditional Todo application, this system includes an intelligent AI assistant:
 
-### 2. Frontend (React)
-1. Navigate to `frontend` folder.
-2. Install packages: `npm install`.
-3. Run app: `npm run dev`.
+* **Smart Context Understanding** — AI reads task titles and understands intent.
+* **Actionable Roadmaps** — Provides execution steps and technical suggestions.
+* **On-Demand Insights** — Users can trigger AI guidance instantly.
+* **Productivity Enhancement** — Helps users complete tasks faster with structured plans.
 
 ---
 
-## 🔑 Environment Variables
-Create a `.env` file in the `backend` folder and add:
-- `AI_API_KEY`: Your Google Gemini or OpenAI API Key.
+# 📊 Analytics Dashboard (New Feature)
+
+The system now includes a **User Analytics Module**:
+
+* Total Tasks Overview
+* Completed vs Pending Analysis
+* Interactive Pie Charts
+* Visual Report Generation
+* Progress Monitoring per User
+* Report Image Export / Print Support
+
+This allows users to track productivity trends and performance visually.
 
 ---
-**Project Structure**:
-- `/backend`: Django API & AI Engine logic.
-- `/frontend`: React UI & State management.
 
-Note: The project is currently using SQLite3 for zero-setup local evaluation. However, the architecture is compatible with MongoDB/MySQL by updating the database engine in settings.py.
+# ✨ Key Features
+
+## 🔐 Authentication & Security
+
+* JWT-based Login & Registration
+* Secure Protected Routes
+* Token-based API Access
+
+## ✅ Task Management
+
+* Create, Update, Delete Tasks
+* Task Status Toggle (Pending / Completed)
+* Real-time UI Updates
+* Task Filtering System
+
+## 🤖 AI Integration
+
+* AI Suggestions for Tasks
+* Technical Guidance & Execution Plans
+* Markdown Rendering Support
+
+## 📈 Analytics & Reporting
+
+* User Productivity Metrics
+* Visual Charts & Reports
+* Export / Print Reports
+* Performance Insights
+
+## 🎨 UI/UX
+
+* Modern Dark Theme
+* Responsive Layout
+* Tailwind CSS Styling
+* Professional Dashboard Design
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+* React.js (Vite)
+* Tailwind CSS
+* Axios
+* Chart.js / Recharts (for analytics)
+
+## Backend
+
+* Django
+* Django Rest Framework (DRF)
+* SimpleJWT Authentication
+
+## Database & Cloud
+
+* Supabase (PostgreSQL)
+* SQLite (optional local development)
+
+## AI Engine
+
+* Python-based AI processing
+* Gemini / OpenAI API Support
+
+---
+
+# 🚀 Installation & Setup
+
+## 1️⃣ Backend (Django)
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+---
+
+## 2️⃣ Frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+# 🔑 Environment Variables
+
+Create `.env` file inside backend folder:
+
+```
+AI_API_KEY=your_ai_api_key
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+SECRET_KEY=django_secret_key
+```
+
+---
+
+# 📂 Project Structure
+
+```
+/backend
+    /tasks
+    /users
+    /analytics
+    /ai_engine
+/frontend
+    /components
+    /pages
+```
+
+---
+
+# 📌 Future Improvements
+
+* Email Notifications
+* Team Collaboration Tasks
+* Deadline Reminder System
+* Mobile App Version
+* Advanced AI Planning Agent
+
+---
+
+# 👨‍💻 Author
+
+**Subhash Dangi**
+
+Full Stack Developer | AI Enthusiast
+
+---
+
+# ⭐ Highlights
+
+This project demonstrates:
+
+✔ Full Stack Development
+✔ AI Integration
+✔ Data Visualization
+✔ Authentication Systems
+✔ Cloud Database Usage
+✔ Production-Ready Architecture
+
+---
+
+# 📜 License
+
+This project is for educational and portfolio purposes.
