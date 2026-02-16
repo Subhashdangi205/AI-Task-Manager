@@ -1,7 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import Analytics from "./pages/Analytics";
+
 import AddTask from "./pages/AddTask";
 import Layout from "./layouts/Layout";
 
@@ -26,6 +31,8 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/add-task" element={<AddTask />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/analytics" element={<Analytics />} />
           </Route>
         </Route>
 

@@ -1,18 +1,25 @@
-import React, { useState, useEffect } from 'react'; 
-import { Link } from 'react-router-dom';
-import API from '../services/api'; 
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import API from "../services/api";
+import ReactMarkdown from "react-markdown";
 
 export default function Dashboard() {
-  const [tasks, setTasks] = useState([]); 
-  const [filter, setFilter] = useState('all');
+  const [tasks, setTasks] = useState([]);
+  const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [aiTip, setAiTip] = useState(null); 
-  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const [aiTip, setAiTip] = useState(null);
+  const [aiLoadingId, setAiLoadingId] = useState(null);
+
+  // 🔹 Edit states
+  const [editingTask, setEditingTask] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   // --- Fetch Tasks ---
   const fetchTasks = async () => {
     try {
-      const res = await API.get('tasks/');
+      const res = await API.get("tasks/");
       setTasks(res.data);
     } catch (err) {
       console.error("Error loading tasks:", err);
@@ -26,111 +33,240 @@ export default function Dashboard() {
   }, []);
 
   //  Toggle Complete Function
+  // --- Toggle Complete ---
   const toggleComplete = async (task) => {
     try {
-      // Backend mein PATCH request bhej rahe hain status change karne ke liye
-      await API.patch(`tasks/${task.id}/`, { completed: !task.completed });
-      fetchTasks(); // List refresh karo naye data ke liye
+      await API.patch(`tasks/${task.id}/`, {
+        completed: !task.completed,
+      });
+      fetchTasks();
     } catch (err) {
-      alert("Could not update task status.");
+      alert("Could not update task status");
     }
   };
 
-  // --- Handle AI Suggestion ---
-  const getAiSuggestion = async (title) => {
-    setIsAiLoading(true);
+  // --- AI Suggestion ---
+  const getAiSuggestion = async (task) => {
+    setAiLoadingId(task.id);
     setAiTip(null);
+
     try {
-      const res = await API.post('ai/suggest/', { title });
-      setAiTip({ title, suggestion: res.data.suggestion });
+      const res = await API.post("ai/suggest/", {
+        title: task.title,
+        description: task.description || "",
+      });
+
+      setAiTip({
+        title: task.title,
+        suggestion: res.data.suggestion,
+      });
     } catch (err) {
-      alert("Failed to get AI suggestion. Please check your API key.");
+      alert("Failed to get AI suggestion");
     } finally {
-      setIsAiLoading(false);
+      setAiLoadingId(null);
     }
   };
 
   // --- Delete Task ---
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      try {
-        await API.delete(`tasks/${id}/`);
-        setTasks(tasks.filter(t => t.id !== id));
-      } catch (err) {
-        alert("Failed to delete the task.");
-      }
+    if (!window.confirm("Delete this task?")) return;
+
+    try {
+      await API.delete(`tasks/${id}/`);
+      setTasks(tasks.filter((t) => t.id !== id));
+    } catch {
+      alert("Failed to delete task");
     }
   };
 
-  const filteredTasks = tasks.filter(task => 
-    filter === 'all' ? true : filter === 'completed' ? task.completed : !task.completed
+  // --- Open Edit ---
+  const openEdit = (task) => {
+    setEditingTask(task);
+    setEditTitle(task.title);
+    setEditDescription(task.description || "");
+  };
+
+  // --- Save Edit ---
+  const saveEdit = async () => {
+    try {
+      await API.patch(`tasks/${editingTask.id}/`, {
+        title: editTitle,
+        description: editDescription,
+      });
+
+      setEditingTask(null);
+      fetchTasks();
+    } catch {
+      alert("Failed to update task");
+    }
+  };
+
+  const filteredTasks = tasks.filter((task) =>
+    filter === "all"
+      ? true
+      : filter === "completed"
+      ? task.completed
+      : !task.completed
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 font-sans">
+    <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-4xl mx-auto">
+
+        {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-400">Task Dashboard</h1>
-          <Link to="/add-task" className="bg-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-            + Create New Task
+          <h1 className="text-3xl font-bold text-blue-400">
+            Dashboard
+          </h1>
+          <Link
+            to="/add-task"
+            className="bg-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-700"
+          >
+            + New Task
           </Link>
         </div>
 
+        {/* AI Output */}
         {aiTip && (
-          <div className="mb-8 p-4 bg-purple-900/30 border border-purple-500 rounded-xl animate-pulse">
-            <h4 className="text-purple-400 font-bold text-sm mb-1">✨ AI Suggestion for "{aiTip.title}":</h4>
-            <p className="text-gray-200">{aiTip.suggestion}</p>
+          <div className="mb-6 p-4 bg-purple-900/30 border border-purple-500 rounded-xl relative">
+            <button
+              onClick={() => setAiTip(null)}
+              className="absolute top-2 right-3 text-gray-400 hover:text-white"
+            >
+              ✕
+            </button>
+
+            <h4 className="text-purple-400 font-bold text-sm mb-1">
+              Powered by Subhash Dangi 
+            </h4>
+            
+            <p className="text-sm mb-2">
+              Roadmap for <b>{aiTip.title}</b>
+            </p>
+           
+            <div className="prose prose-invert max-w-none">
+              <ReactMarkdown>{aiTip.suggestion}</ReactMarkdown>
+            </div>
           </div>
         )}
 
-        <div className="mb-6 flex gap-4">
-          {['all', 'pending', 'completed'].map((f) => (
-            <button 
+        {/* Filters */}
+        <div className="mb-6 flex gap-3">
+          {["all", "pending", "completed"].map((f) => (
+            <button
               key={f}
-              onClick={() => setFilter(f)} 
-              className={`px-4 py-1 rounded-full text-sm capitalize transition ${filter === f ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-1 rounded-full text-sm ${
+                filter === f
+                  ? "bg-blue-600"
+                  : "bg-gray-800 text-gray-400"
+              }`}
             >
               {f}
             </button>
           ))}
         </div>
 
-        <div className="space-y-4">
-          {loading ? (
-            <div className="text-center py-10 text-gray-500">Loading your tasks...</div>
-          ) : filteredTasks.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">No tasks found. Create one to get started!</div>
-          ) : filteredTasks.map(task => (
-            <div key={task.id} className="bg-gray-800 p-5 rounded-xl flex justify-between items-center border border-gray-700 hover:border-blue-500/50 transition">
+        {/* Task List */}
+        {loading ? (
+          <p className="text-gray-400">Loading...</p>
+        ) : filteredTasks.length === 0 ? (
+          <p className="text-gray-500">No tasks found</p>
+        ) : (
+          filteredTasks.map((task) => (
+            <div
+              key={task.id}
+              className="bg-gray-800 p-5 rounded-xl flex justify-between items-center mb-3"
+            >
               <div>
-                <h3 className={`font-bold text-lg ${task.completed ? 'line-through text-gray-500' : 'text-gray-100'}`}>
+                <h3
+                  className={`text-lg font-bold ${
+                    task.completed
+                      ? "line-through text-gray-500"
+                      : ""
+                  }`}
+                >
                   {task.title}
                 </h3>
-                <p className="text-gray-400 text-sm mt-1">{task.description}</p>
+                <p className="text-sm text-gray-400">
+                  {task.description}
+                </p>
               </div>
-              
-              <div className="flex gap-3 items-center">
-                <button 
-                  onClick={() => getAiSuggestion(task.title)}
-                  disabled={isAiLoading}
-                  className="bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-3 py-1.5 rounded-lg font-bold transition disabled:opacity-50"
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => getAiSuggestion(task)}
+                  className="bg-purple-600 px-3 py-1 text-xs rounded"
                 >
-                  {isAiLoading ? 'Analyzing...' : 'AI Insights ✨'}
+                  AI ✨
                 </button>
 
                 {/* Complete/Undo Button */}
                 <button 
+                
                   onClick={() => toggleComplete(task)}
-                  className={`px-2 py-1 rounded transition text-sm font-medium ${task.completed ? 'text-yellow-500 hover:bg-yellow-500/10' : 'text-green-500 hover:bg-green-500/10'}`}
+                  className="text-green-400 text-sm"
                 >
-                  {task.completed ? 'Undo' : 'Complete'}
+                  {task.completed ? "Undo" : "Complete"}
                 </button>
 
-                <button onClick={() => handleDelete(task.id)} className="text-red-500 hover:bg-red-500/10 px-2 py-1 rounded transition text-sm">Delete</button>
+                <button
+                  onClick={() => openEdit(task)}
+                  className="text-blue-400 text-sm"
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => handleDelete(task.id)}
+                  className="text-red-400 text-sm"
+                >
+                  Delete
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+          ))
+        )}
+
+        {/* EDIT MODAL */}
+        {editingTask && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
+            <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4">Edit Task</h2>
+
+              <input
+                className="w-full mb-3 p-2 rounded bg-gray-900"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Title"
+              />
+
+              <textarea
+                className="w-full mb-4 p-2 rounded bg-gray-900"
+                rows="4"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                placeholder="Description"
+              />
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setEditingTask(null)}
+                  className="text-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveEdit}
+                  className="bg-blue-600 px-4 py-1 rounded"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
